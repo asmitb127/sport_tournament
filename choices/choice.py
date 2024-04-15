@@ -1,7 +1,8 @@
-Status = {
-    'A': "active",
-    'I': "inactive",
-    'C': "canceled"
+Sport_Status = {
+    'Not-Started': 'not_started',
+    'Active': "active",
+    'Cancelled': "cancelled",
+    'Ended': 'ended',
 }
 
 Tournament_Type = {
