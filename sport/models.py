@@ -5,7 +5,6 @@ from datetime import datetime
 
 from choices.choice import Sport_Status
 
-# Create your models here.
 
 class Team(models.Model):
     competitor_id = models.CharField(max_length=255)
@@ -29,14 +28,25 @@ class SportLeague(models.Model):
     def __str__(self) -> str:
         return self.title
 
-class SeasonSportLeague(models.Model):
+class Season(models.Model):
     season_id = models.CharField(max_length=255)
+    name = models.CharField(max_length=255)
+    year = models.CharField(max_length=255)
+
+    def __str__(self) -> str:
+        return f"{self.name} {self.year}"
+
+class SeasonSportLeague(models.Model):
+    season = models.ForeignKey(Season, on_delete=models.CASCADE)
+    league = models.ForeignKey(SportLeague, on_delete=models.CASCADE)
+    start_datetime = models.DateTimeField(default=now())
+    end_datetime = models.DateTimeField(blank=True, null=True)
 
 class SportEvent(models.Model):
     league = models.ForeignKey(SportLeague, on_delete=models.RESTRICT)
     start_datetime = models.DateTimeField(default=now())
     end_datetime = models.DateTimeField(blank=True, null=True)
-    status = models.CharField(max_length=1, choices=Sport_Status, default=Sport_Status['Not-Started'])
+    status = models.CharField(max_length=50, choices=Sport_Status, default=Sport_Status['Not-Started'])
 
     def __str__(self) -> str:
         return f"{self.start_datetime.date()} {self.league.sport.title} {self.league.title}"
