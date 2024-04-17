@@ -12,3 +12,9 @@
     1. Competitions
     2. Competition Season
     3. Season Lineups
+
+
+### Run seed
+    1. python manage.py shell
+    2. from sport.seed_datas import run_seeder
+    3. run_seeder()

@@ -15,6 +15,7 @@ import environ, os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+print("🚀 ~ BASE_DIR:", BASE_DIR)
 
 env = environ.Env(
     # set casting, default value
@@ -49,6 +50,11 @@ INSTALLED_APPS = [
     'core',
     'sport',
     'tournament',
+
+    # Third party apps
+    'django_seed',
+    "django_crontab"
+
 ]
 
 MIDDLEWARE = [
@@ -136,3 +142,8 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = "core.CustomUser"
+
+# Crontab settings
+CRONJOBS = [
+    ('*/30 * * * *', 'sport.seed_datas.get_competition')
+]
