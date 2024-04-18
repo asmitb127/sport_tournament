@@ -39,8 +39,8 @@ class Season(models.Model):
 class SeasonSportLeague(models.Model):
     season = models.ForeignKey(Season, on_delete=models.CASCADE)
     league = models.ForeignKey(SportLeague, on_delete=models.CASCADE)
-    start_datetime = models.DateTimeField(default=now())
-    end_datetime = models.DateTimeField(blank=True, null=True)
+    start_date = models.DateField(default=now())
+    end_date = models.DateField(blank=True, null=True)
 
 class SportEvent(models.Model):
     league = models.ForeignKey(SportLeague, on_delete=models.RESTRICT)

@@ -2,5 +2,7 @@ __pycache__/
 .env
 
 migrations/
+migrations_bk/
 
 myenv/
+log.log

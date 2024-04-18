@@ -1,14 +1,36 @@
 from django_seed import Seed
 import requests, logging
 
+import environ, os
+from pathlib import Path
+
 from sport.models import Sport, Season, SportLeague, SeasonSportLeague, Team, SportEvent
-from sport.api import path, get_full_path
 
 logger = logging.getLogger(__name__)
-# logging.basicConfig(filename='example.log', encoding='utf-8', level=logging.DEBUG)
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(filename='log.log', encoding='utf-8', level=logging.DEBUG)
+# logging.basicConfig(level=logging.DEBUG)
+
+env = environ.Env(DEBUG=(bool, False))
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 seeder = Seed.seeder()
+
+# add path of api
+path={
+    'competition': '/en/competitions',
+    'competition_season': '/en/competitions/:urn_competition/seasons',
+}
+
+def get_full_path(path, query=''):
+    '''
+    Get full path per api.
+    '''
+    url = env('baseUrl')
+    format = env('format')
+    api_key = env('api_key')
+    return f"{url}{path}.{format}?api_key={api_key}{query}"
 
 
 # headers = {'User-Agent': 'My User Agent'}
@@ -45,16 +67,22 @@ def get_season_competition():
         data = response.json()
         if response.status_code == 200:
             for each in data.get('seasons'):
-                # if not SeasonSportLeague.objects.filter(competition_id=each.get('id')).exists():
                 current_season = Season.objects.filter(season_id=each['id'])
-                if current_season.exists():
-                    if not SeasonSportLeague.objects.filter(season=current_season).exists():
-                        SeasonSportLeague.objects.create(
-                            competition = each_comp,
-                            season_id = each['id'],
-                            start_datetime = each['start_date'],
-                            end_datetime = each['end_date'],
-                        )
+                if not current_season.exists():
+                    current_season = Season.objects.create(
+                        season_id=each['id'],
+                        name=each['name'],
+                        year=each['year']
+                    )
+                else:
+                    current_season=current_season.get()
+                if not SeasonSportLeague.objects.filter(season=current_season).filter(league=each_comp).filter(start_date= each['start_date']).filter(end_date= each['end_date']).exists():
+                    SeasonSportLeague.objects.create(
+                        season = current_season,
+                        league = each_comp,
+                        start_date = each['start_date'],
+                        end_date = each['end_date'],
+                    )
 
 def run_seeder():
     # get_compettion()

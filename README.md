@@ -13,6 +13,9 @@
     2. Competition Season
     3. Season Lineups
 
+### Debug log
+        tail -f log.log
+
 
 ### Run seed
     1. python manage.py shell
