@@ -53,7 +53,7 @@ INSTALLED_APPS = [
 
     # Third party apps
     'django_seed',
-    "django_crontab"
+    # "django_crontab"
 
 ]
 
@@ -93,11 +93,16 @@ WSGI_APPLICATION = 'sport_tournament.wsgi.application'
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        'NAME': env('DB_NAME'),
-        'USER': env('DB_USER'),
-        'PASSWORD': env('DB_PASSWORD'),
-        'HOST':'127.0.0.1'
+        # "ENGINE": "django.db.backends.postgresql",
+        # 'NAME': env('DB_NAME'),
+        # 'USER': env('DB_USER'),
+        # 'PASSWORD': env('DB_PASSWORD'),
+        # 'HOST':'127.0.0.1'
+          
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": "sport_tournament.db",
+    
+
     }
 }
 
@@ -141,7 +146,7 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-AUTH_USER_MODEL = "core.CustomUser"
+# AUTH_USER_MODEL = "core.CustomUser"
 
 # Crontab settings
 CRONJOBS = [

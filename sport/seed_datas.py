@@ -38,20 +38,23 @@ def get_season_competition():
     '''
     competition = SportLeague.objects.all().iterator()
     for each_comp in competition:
-        query = f'''&start_date=2023-01-01&end_date=2024-12-30&urn_competition={each_comp.competition_id}'''
-        url_path = get_full_path(path['competition_season'], query)
+        query = f'''&start_date=2023-01-01&end_date=2024-12-30'''
+        url_path = get_full_path(f'/en/competitions/{each_comp.competition_id}/seasons', query)
         response = requests.get(url_path)
         logging.info('response %s', response)
         data = response.json()
         if response.status_code == 200:
             for each in data.get('seasons'):
-                if not SeasonSportLeague.objects.filter(competition_id=each.get('id')).exists():
-                    SeasonSportLeague.objects.create(
-                        competition = each_comp,
-                        season_id = each['id'],
-                        start_datetime = each['start_date'],
-                        end_datetime = each['end_date'],
-                    )
+                # if not SeasonSportLeague.objects.filter(competition_id=each.get('id')).exists():
+                current_season = Season.objects.filter(season_id=each['id'])
+                if current_season.exists():
+                    if not SeasonSportLeague.objects.filter(season=current_season).exists():
+                        SeasonSportLeague.objects.create(
+                            competition = each_comp,
+                            season_id = each['id'],
+                            start_datetime = each['start_date'],
+                            end_datetime = each['end_date'],
+                        )
 
 def run_seeder():
     # get_compettion()
