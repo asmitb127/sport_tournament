@@ -49,8 +49,8 @@ INSTALLED_APPS = [
     'core',
     'sport',
     'tournament',
-
     # Third party apps
+    'rest_framework',
     'django_seed',
     # "django_crontab"
 

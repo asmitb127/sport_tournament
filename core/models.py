@@ -9,6 +9,8 @@ from core.maanger import CustomUserManager
 
 class CustomUser(AbstractUser):
     email = models.EmailField(_("email address"), unique=True)
+    phone_number = models.PositiveIntegerField()
+    nationality = models.CharField(max_length=255, blank=True)
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
