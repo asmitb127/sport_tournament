@@ -6,3 +6,6 @@ migrations_bk/
 
 myenv/
 log.log
+
+sport_tournament.db
+sport_tournament_bk.db

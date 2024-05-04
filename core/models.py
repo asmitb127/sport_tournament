@@ -7,14 +7,14 @@ from django.utils.translation import gettext_lazy as _
 
 from core.maanger import CustomUserManager
 
-# class CustomUser(AbstractUser):
-    # email = models.EmailField(_("email address"), unique=True)
+class CustomUser(AbstractUser):
+    email = models.EmailField(_("email address"), unique=True)
 
-    # USERNAME_FIELD = "email"
-    # REQUIRED_FIELDS = []
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = []
 
-    # objects = CustomUserManager()
+    objects = CustomUserManager()
 
-    # def __str__(self):
-    #     return self.email
-    # pass
+    def __str__(self):
+        return self.email
+    pass
