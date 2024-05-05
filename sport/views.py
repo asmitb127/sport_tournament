@@ -1,7 +1,7 @@
 import datetime, json
 from rest_framework import permissions, generics, views
 from rest_framework.response import Response
-from seed_datas import get_leagues, get_seasons, get_schedule
+from .seed_datas import get_leagues, get_seasons, get_schedule
 from .models import Sport, SportLeague, Season, SportEvent
 
 
