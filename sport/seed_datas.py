@@ -19,8 +19,9 @@ seeder = Seed.seeder()
 
 # add path of api
 path={
-    'competition': '/en/competitions',
-    'competition_season': '/en/competitions/:urn_competition/seasons',
+    'league': '/v3/football/leagues',
+    'competition_season': '/v3/football/seasons/search/2024',
+    'schedule': '/v3/football/schedules/seasons/'
 }
 
 def get_full_path(path, query=''):
@@ -28,9 +29,48 @@ def get_full_path(path, query=''):
     Get full path per api.
     '''
     url = env('baseUrl')
-    format = env('format')
     api_key = env('api_key')
-    return f"{url}{path}.{format}?api_key={api_key}{query}"
+    return f"{url}{path}?api_key={api_key}{query}"
+
+
+def get_leagues():
+    url_path = get_full_path(path['league'])
+    response = requests.get(url_path)
+    logging.info('response %s', response)
+    data = response.json()
+
+    return data.get("data")
+
+
+def get_seasons():
+    url_path = get_full_path(path['competition_season'])
+    response = requests.get(url_path)
+    logging.info('response %s', response)
+    data = response.json()
+    return data.get("data")
+
+def get_schedule(season_id):
+    url_path = get_full_path(path['schedule'], season_id)
+    response = requests.get(url_path)
+    logging.info('response %s', response)
+    data = response.json()
+    return data.get("data")
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # headers = {'User-Agent': 'My User Agent'}
