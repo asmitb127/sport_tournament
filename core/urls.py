@@ -24,4 +24,6 @@ router = routers.DefaultRouter()
 urlpatterns = [
     path('', include(router.urls)),
     path('register/', views.RegisterView.as_view(), name='auth_register'),
+    path('login/', views.Userlogin.as_view(), name='auth_login'),
+    path('logout/', views.UserLogout.as_view(), name='auth_logout'),
 ]

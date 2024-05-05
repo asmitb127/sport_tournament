@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'tournament',
     # Third party apps
     'rest_framework',
+    'rest_framework.authtoken',
     'django_seed',
     # "django_crontab"
 

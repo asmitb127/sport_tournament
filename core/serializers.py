@@ -5,10 +5,6 @@ from core.models import CustomUser as User
 
 
 class RegisterSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(
-            required=True,
-            validators=[UniqueValidator(queryset=User.objects.all())]
-            )
 
     password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
 
@@ -31,5 +27,5 @@ class RegisterSerializer(serializers.ModelSerializer):
 
         user.set_password(validated_data['password'])
         user.save()
-
         return user
+
