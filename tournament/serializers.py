@@ -10,15 +10,16 @@ class TournamentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tournament
         fields = '__all__'
+        extra_kwargs = {'created_by': {'read_only': True}}
 
 
     def create(self, validated_data):
-        sport_id = validated_data['sport_id'] or {validated_data.get('sport') or  {}}.get('id')
+        sport_id = validated_data['sport']
         try:
             sport = Sport.objects.get(pk=sport_id)
         except Sport.DoesNotExist:
             raise Exception({'sport': ['Sport not found']})
-        sport_event_id = validated_data['sport_event_id'] or {validated_data.get('sport_event') or  {}}.get('id')
+        sport_event_id = validated_data['sport_event']
         try:
             sport_event = SportEvent.objects.get(pk=sport_event_id)
         except Sport.DoesNotExist:

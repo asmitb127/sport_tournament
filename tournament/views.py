@@ -9,4 +9,5 @@ class TournamentViewSet(viewsets.ModelViewSet):
     serializer_class = TournamentSerializer
 
     def perform_create(self, serializer):
-        serializer.save(created_by=self.request.user)
+        self.created_by = self.request.user
+        return super().perform_create(serializer)

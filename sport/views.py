@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from .seed_datas import get_leagues, get_seasons, get_schedule
 from .models import Sport, SportLeague, Season, SportEvent
 from django.utils.timezone import now
-
+from .serializers import SportEventSerializer
 
 # Create your views here.
 class SportView(views.APIView):
@@ -137,7 +137,12 @@ class SportView(views.APIView):
         return Response({ "success": "true" })
 
 
-    
+class SportList(generics.ListAPIView):
+    queryset = SportEvent.objects.all()
+    serializer_class = SportEventSerializer
+
+
+
         
 
 
