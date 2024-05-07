@@ -30,7 +30,7 @@ def get_full_path(path, query=''):
     '''
     url = env('baseUrl')
     api_key = env('api_key')
-    return f"{url}{path}?api_key={api_key}{query}"
+    return f"{url}{path}{query}?api_token={api_key}"
 
 
 def get_leagues():
