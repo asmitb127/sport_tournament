@@ -4,7 +4,7 @@ import requests, logging
 import environ, os
 from pathlib import Path
 
-from sport.models import Sport, Season, SportLeague, SeasonSportLeague, Team, SportEvent
+from sport.models import Sport, Season, SportLeague, SportEvent
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(filename='log.log', encoding='utf-8', level=logging.DEBUG)
