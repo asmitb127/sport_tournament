@@ -3,6 +3,7 @@ from rest_framework import permissions, generics, views
 from rest_framework.response import Response
 from .seed_datas import get_leagues, get_seasons, get_schedule
 from .models import Sport, SportLeague, Season, SportEvent
+from django.utils.timezone import now
 
 
 # Create your views here.
@@ -12,7 +13,7 @@ class SportView(views.APIView):
     def __init__(self):
         pass
 
-    def get_current_leagues(request):
+    def get_current_leagues(self):
         try:
             leagues = get_leagues()
             # create sport for the first time
@@ -39,9 +40,10 @@ class SportView(views.APIView):
             leagues_json = json.dumps(leagues)
             return Response(leagues_json)
         except Exception as e:
+            print("exceptation on league", str(e))
             return Response(str(e))
 
-    def get_running_seasons(request):
+    def get_running_seasons(self):
         try:
             seasons = get_seasons()
             for season in seasons:
@@ -59,16 +61,17 @@ class SportView(views.APIView):
                                 season_id = season['id'],
                                 league = league,
                                 name = season['name'],
-                                start_date = season['start_date'],
-                                end_date = season['end_date'],
+                                starting_date = season['starting_at'],
+                                ending_date = season['ending_at'],
                             ).save()
 
             seasons_json = json.dumps(seasons)
             return Response(seasons_json)
         except Exception as e:
+            print("exceptation on season", str(e))
             return Response(str(e))
 
-    def get_participants(participants):
+    def get_participants(self, participants):
         home = ""
         away = ""
         for participant in participants:
@@ -78,7 +81,7 @@ class SportView(views.APIView):
                 away = participant['name']
         return home, away
 
-    def get_game_results(scores):
+    def get_game_results(self, scores):
         home_score = 0
         away_score = 0
         for score in scores:
@@ -88,49 +91,50 @@ class SportView(views.APIView):
                 home_score += score["score"]["goals"]
         return home_score, away_score
 
-    def get_running_schedule(self, request):
+    def get_running_schedule(self):
         try: 
-            seasons = Season.objects.filter(end_date__gte=datetime.now())
-            for season in seasons:
-                schedule = get_schedule(season.season_id)
-                for rounds in schedule:
-                    for event in rounds:
-                        current_event = SportEvent.objects.filter(event_id=event['id'])
-                        if current_event.exists():
-                            home_score, away_score = self.get_game_results(event['scores'])
-                            current_event.update(
-                                home_score = home_score,
-                                away_score = away_score,
-                                status = "updated",
-                            )
-                        else:
-                            home_team, away_team = self.get_participants(event['participants'])
-                            SportEvent.objects.create(
-                                event_id = event['id'],
-                                league = season.league,
-                                home_team = home_team,
-                                away_team = away_team,
-                                start_datetime = event['start_datetime'],
-                                status = "running",
-                            ).save()
-
+            seasons = Season.objects.filter(ending_date__gte=now())
+            if seasons.exists():
+                for season in seasons:
+                    schedule = get_schedule(season.season_id)
+                    for rounds in schedule:
+                        for round in rounds:
+                            current_event = SportEvent.objects.filter(event_id=round['id'])
+                            if current_event.exists():
+                                home_score, away_score = self.get_game_results(round['scores'])
+                                current_event.update(
+                                    home_score = home_score,
+                                    away_score = away_score,
+                                    status = "updated",
+                                )
+                            else:
+                                home_team, away_team = self.get_participants(round['participants'])
+                                SportEvent.objects.create(
+                                    event_id = round['id'],
+                                    league = season.league,
+                                    home_team = home_team,
+                                    away_team = away_team,
+                                    start_datetime = round['start_datetime'],
+                                    status = "running",
+                                ).save()
 
         except Exception as e:
+            print("exceptation on schedule", str(e))
             return Response(str(e))
 
     def get(self, request):
-        type = request.get('type', None)
-
+        #get query 
+        type = request.GET.get("type", None)
+        print(f'type is {type}')
         if type == 'leagues':
-            return self.get_current_leagues(request)
+            self.get_current_leagues()
         elif type == 'seasons':
-            return self.get_running_seasons(request)
+            self.get_running_seasons()
         elif type == 'schedule':
-            return self.get_running_schedule(request)
+            self.get_running_schedule()
 
+        return Response({ "success": "true" })
 
-def get_seasons(request):
-    pass
 
     
         
