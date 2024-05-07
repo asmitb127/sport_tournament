@@ -3,10 +3,11 @@ from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 
 from django.core import serializers
+from django.contrib.auth import authenticate
 
 from core.models import CustomUser as User
 from core.serializers import RegisterSerializer
-from core.custom_permissions import UserAuthenticated
+from core.custom_permissions import TokenAuthentications
 
 
 class RegisterView(generics.CreateAPIView):
@@ -18,23 +19,21 @@ class Userlogin(views.APIView):
     permission_classes = (permissions.AllowAny,)
 
     def post(self, request):
-        email = request.data.get('email')
-        password = request.data.get('password')
         try:
-             user = User.objects.get(email=email)
-        except User.DoesNotExist:
-            return Response({'email': ['Email not found']}, status=status.HTTP_400_BAD_REQUEST)
-        if user.password == password:
+            email = request.data.get('email')
+            password = request.data.get('password')
+            user = authenticate(email=email, password=password)
             try:
                 token = Token.objects.get(user=user)
             except Token.DoesNotExist:
                 token = Token.objects.create(user=user)
             return Response({'token': token.key}, status=status.HTTP_200_OK)
-        else:
+        except Exception as e:
             return Response({'credentials': ['Incorrect email or password credential.']}, status=status.HTTP_400_BAD_REQUEST)
 
 class UserLogout(views.APIView):
-    permission_classes = (UserAuthenticated,)
+    authentication_classes = [TokenAuthentications]
+    permission_classes = [permissions.IsAuthenticated,]
 
     def post(self, request):
         try:
