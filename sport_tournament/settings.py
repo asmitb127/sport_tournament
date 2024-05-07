@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'django_seed',
+    'django_filters',
     # "django_crontab"
 
 ]
@@ -152,3 +153,8 @@ AUTH_USER_MODEL = "core.CustomUser"
 CRONJOBS = [
     ('*/30 * * * *', 'sport.seed_datas.get_competition')
 ]
+
+#rest framework setting
+REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
+}

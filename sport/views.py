@@ -5,6 +5,7 @@ from .seed_datas import get_leagues, get_seasons, get_schedule
 from .models import Sport, SportLeague, Season, SportEvent
 from django.utils.timezone import now
 from .serializers import SportEventSerializer
+from choices.choice  import Sport_Status
 
 # Create your views here.
 class SportView(views.APIView):
@@ -102,22 +103,40 @@ class SportView(views.APIView):
                             for fixture in round['fixtures']:
                                 current_event = SportEvent.objects.filter(event_id=fixture['id'])
                                 if current_event.exists():
-                                    home_score, away_score = self.get_game_results(fixture['scores'])
-                                    current_event.update(
-                                        home_score = home_score,
-                                        away_score = away_score,
-                                        status = "updated",
-                                    )
+                                    if len(fixture['scores']) > 0:
+                                        home_score, away_score = self.get_game_results(fixture['scores'])
+                                        
+                                        if home_score >0 | away_score > 0:
+                                            current_event.update(
+                                                home_score = home_score,
+                                                away_score = away_score,
+                                            )
+                                        
+                                        if len(str(fixture['details']))>5:
+                                            current_event.update(
+                                                status = Sport_Status['Ended']
+                                            )
+                                        else:
+                                            current_event.update(
+                                                status = Sport_Status['Active']
+                                            )
+                                    else:
+                                        current_event.update(
+                                            status = Sport_Status['Not-Started']
+                                        ) 
+
                                 else:
                                     home_team, away_team = self.get_participants(fixture['participants'])
                                     SportEvent.objects.create(
                                         event_id = fixture['id'],
+                                        season = season,
                                         league = season.league,
                                         home_team = home_team,
                                         away_team = away_team,
                                         start_datetime = fixture['starting_at'],
-                                        status = "running",
+                                        status = Sport_Status['Not-Started']
                                     ).save()
+                                
 
         except Exception as e:
             print("exceptation on schedule", str(e))
@@ -140,6 +159,12 @@ class SportView(views.APIView):
 class SportList(generics.ListAPIView):
     queryset = SportEvent.objects.all()
     serializer_class = SportEventSerializer
+
+
+    search_fields = ['league']
+    order_fields = ['start_datetime', 'status']
+    filterset_fields = ['league', 'event_id','status']
+
 
 
 
