@@ -68,27 +68,51 @@ class SportView(views.APIView):
         except Exception as e:
             return Response(str(e))
 
-    def get_running_schedule(request):
-        try: 
+    def get_participants(participants):
+        home = ""
+        away = ""
+        for participant in participants:
+            if participant['meta']['location'] == "home":
+                home = participant['name']
+            elif participant['meta']['location'] == "away":
+                away = participant['name']
+        return home, away
 
+    def get_game_results(scores):
+        home_score = 0
+        away_score = 0
+        for score in scores:
+            if score["score"]["participant"] == "away":
+                away_score += score["score"]["goals"]
+            elif score["score"]["participant"] == "home":
+                home_score += score["score"]["goals"]
+        return home_score, away_score
+
+    def get_running_schedule(self, request):
+        try: 
             seasons = Season.objects.filter(end_date__gte=datetime.now())
             for season in seasons:
                 schedule = get_schedule(season.season_id)
-                for event in schedule:
-                    current_event = SportEvent.objects.filter(event_id=event['id'])
-                    if current_event.exists():
-                        continue
-                    else:
-                        SportEvent.objects.create(
-                            event_id = event['id'],
-                            season = season,
-                            start_date = event['start_date'],
-                            end_date = event['end_date'],
-                            title = event['title'],
-                            description = event['description'],
-                            location = event['location'],
-                            status = event['status'],
-                        ).save()
+                for rounds in schedule:
+                    for event in rounds:
+                        current_event = SportEvent.objects.filter(event_id=event['id'])
+                        if current_event.exists():
+                            home_score, away_score = self.get_game_results(event['scores'])
+                            current_event.update(
+                                home_score = home_score,
+                                away_score = away_score,
+                                status = "updated",
+                            )
+                        else:
+                            home_team, away_team = self.get_participants(event['participants'])
+                            SportEvent.objects.create(
+                                event_id = event['id'],
+                                league = season.league,
+                                home_team = home_team,
+                                away_team = away_team,
+                                start_datetime = event['start_datetime'],
+                                status = "running",
+                            ).save()
 
 
         except Exception as e:
