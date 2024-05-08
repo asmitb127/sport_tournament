@@ -169,6 +169,15 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Authentication backends
+AUTHENTICATION_BACKENDS = [
+    # Django ModelBackend is the default authentication backend.
+    'django.contrib.auth.backends.ModelBackend',
+    # Add your token authentication backend here
+    # For example, if you're using Django REST Framework's token authentication
+    'rest_framework.authentication.TokenAuthentication',
+]
 AUTH_USER_MODEL = "core.CustomUser"
 
 # Crontab settings
