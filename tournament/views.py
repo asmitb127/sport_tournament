@@ -12,12 +12,12 @@ class TournamentViewSet(viewsets.ModelViewSet):
         self.created_by = self.request.user
         return super().perform_create(serializer)
     
-    def get_queryset(self):
-        #create a queryset to get the tournament and events
+    # def get_queryset(self):
+    #     #create a queryset to get the tournament and events
         
-        queryset = Tournament.objects.all()
+    #     queryset = Tournament.objects.all()
         
-        return queryset
+    #     return queryset
 
 
 class PoolEntryViewSet(viewsets.GenericViewSet, viewsets.mixins.CreateModelMixin, viewsets.mixins.ListModelMixin, viewsets.mixins.RetrieveModelMixin, viewsets.mixins.UpdateModelMixin, viewsets.mixins.DestroyModelMixin):
