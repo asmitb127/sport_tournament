@@ -11,6 +11,7 @@ from core.models import CustomUser
 
 # pool is tournament 
 class Tournament(models.Model):
+
     tournament_id = models.IntegerField()
     start_time = models.DateField()
     end_time = models.DateField()
@@ -26,14 +27,15 @@ class Tournament(models.Model):
     
 # it saves the pool entry for the tournament for different users 
 class PoolEntry(models.Model):
-    tournament = models.ManyToManyField(Tournament)
+    tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE)
     entry_txn = models.TextField(max_length=100)
-    
+    player = models.ForeignKey(CustomUser, on_delete=models.RESTRICT)
     network = models.CharField(max_length=10, choices=NETWORK,default=NETWORK['ETH'] )
     join_time = models.DateTimeField(default=now())
 
     
 class Picks(models.Model):
-    pool_entry = models.OneToOneField(PoolEntry, on_delete=models.CASCADE)
+    pool_entry = models.ForeignKey(PoolEntry, on_delete=models.CASCADE)
     event_id = models.ForeignKey(SportEvent, on_delete=models.CASCADE)
     pick = models.CharField(max_length=5, choices=PICK_CHOICE)
+

@@ -1,8 +1,10 @@
 from rest_framework import serializers
-from django.utils.timezone import now
+
 from choices.choice import Tournament_Type
-from tournament.models import Picks, Tournament, PoolEntry
-from sport.models import SportEvent
+from tournament.models import Tournament, PoolEntry, Picks
+from sport.models import Sport, SportEvent
+
+from datetime import datetime
 
 
 class TournamentSerializer(serializers.ModelSerializer):
@@ -13,7 +15,7 @@ class TournamentSerializer(serializers.ModelSerializer):
         extra_kwargs = {'created_by': {'read_only': True}}
 
     def validate_start_time(self, value):
-        if value < now():
+        if value < datetime.now():
             raise serializers.ValidationError("Start time cannot be in the past")
         return value
 
@@ -79,4 +81,4 @@ class PoolEntrySerializer(serializers.ModelSerializer):
             ).save()
 
         return pool_entry
-    
+

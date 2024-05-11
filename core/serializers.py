@@ -7,21 +7,21 @@ from core.models import CustomUser as User
 class RegisterSerializer(serializers.ModelSerializer):
 
     password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
+    full_name = serializers.CharField(write_only=True, required=True)
 
     class Meta:
         model = User
-        fields = ('username', 'password', 'email', 'first_name', 'last_name', 'phone_number', 'nationality')
-        extra_kwargs = {
-            'first_name': {'required': True},
-            'last_name': {'required': True}
-        }
+        fields = ('username', 'password', 'email', 'first_name', 'last_name', 'phone_number', 'nationality', 'full_name')
 
     def create(self, validated_data):
+        full_name = validated_data['full_name'].split(' ')
+        if len(full_name) <2:
+            full_name.append(' ')
         user = User.objects.create(
             username=validated_data['username'],
             email=validated_data['email'],
-            first_name=validated_data['first_name'],
-            last_name=validated_data['last_name'],
+            first_name=' '.join(full_name[:len(full_name)-1]),
+            last_name=full_name[-1],
             phone_number=validated_data['phone_number']
         )
 

@@ -1,9 +1,9 @@
 from rest_framework import viewsets
 
-from tournament.serializers import PoolEntrySerializer, TournamentSerializer
-from tournament.models import Tournament, PoolEntry, Picks
+from tournament.serializers import TournamentSerializer, PoolEntrySerializer
+from tournament.models import Tournament, PoolEntry
 
-# pool is the tournament for now
+
 class TournamentViewSet(viewsets.ModelViewSet):
     queryset = Tournament.objects.all()
     serializer_class = TournamentSerializer
