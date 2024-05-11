@@ -2,3 +2,13 @@ __pycache__/
 .env
 
 migrations/
+migrations_bk/
+
+myenv/
+log.log
+
+sport_tournament.db
+sport_tournament_bk.db
+sport_tournament1.db
+
+.vscode/

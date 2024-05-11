@@ -49,17 +49,46 @@ INSTALLED_APPS = [
     'core',
     'sport',
     'tournament',
+    # Third party apps
+    'corsheaders',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'django_seed',
+    'django_filters',
+    # "django_crontab"
+
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+]
+CORS_ALLOW_METHODS = (
+    "DELETE",
+    "GET",
+    "OPTIONS",
+    "PATCH",
+    "POST",
+    "PUT",
+)
+CORS_ALLOW_HEADERS = (
+    "accept",
+    "authorization",
+    "content-type",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
+)
 
 ROOT_URLCONF = 'sport_tournament.urls'
 
@@ -87,11 +116,16 @@ WSGI_APPLICATION = 'sport_tournament.wsgi.application'
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        'NAME': env('DB_NAME'),
-        'USER': env('DB_USER'),
-        'PASSWORD': env('DB_PASSWORD'),
-        'HOST':'127.0.0.1'
+        # "ENGINE": "django.db.backends.postgresql",
+        # 'NAME': env('DB_NAME'),
+        # 'USER': env('DB_USER'),
+        # 'PASSWORD': env('DB_PASSWORD'),
+        # 'HOST':'127.0.0.1'
+          
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": "sport_tournament1.db",
+    
+
     }
 }
 
@@ -135,4 +169,23 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Authentication backends
+AUTHENTICATION_BACKENDS = [
+    # Django ModelBackend is the default authentication backend.
+    'django.contrib.auth.backends.ModelBackend',
+    # Add your token authentication backend here
+    # For example, if you're using Django REST Framework's token authentication
+    'rest_framework.authentication.TokenAuthentication',
+]
 AUTH_USER_MODEL = "core.CustomUser"
+
+# Crontab settings
+CRONJOBS = [
+    ('*/30 * * * *', 'sport.seed_datas.get_competition')
+]
+
+#rest framework setting
+REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
+}

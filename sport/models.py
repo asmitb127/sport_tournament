@@ -5,15 +5,8 @@ from datetime import datetime
 
 from choices.choice import Sport_Status
 
-# Create your models here.
 
-class Team(models.Model):
-    competitor_id = models.CharField(max_length=255)
-    title = models.CharField(max_length=125)
-
-    def __str__(self) -> str:
-        return self.title
-
+# Sport saves the type of sport 
 class Sport(models.Model):
     name = models.CharField(max_length=255)
     title = models.CharField(max_length=125)
@@ -21,34 +14,38 @@ class Sport(models.Model):
     def __str__(self) -> str:
         return self.title
 
+# Leagues saves the leagues that are available for a sport
+
 class SportLeague(models.Model):
-    competition_id = models.CharField(max_length=255)
     sport = models.ForeignKey(Sport, on_delete=models.SET_NULL, blank=True, null=True)
     title = models.CharField(max_length=125)
+    league_id = models.IntegerField(blank=False, null=False, default=0)
 
     def __str__(self) -> str:
         return self.title
 
-class SeasonSportLeague(models.Model):
-    season_id = models.CharField(max_length=255)
-
-class SportEvent(models.Model):
+# Season stores the season id for the running leagues 
+class Season(models.Model):
+    season_id = models.IntegerField()
     league = models.ForeignKey(SportLeague, on_delete=models.RESTRICT)
+    name = models.CharField(max_length=255)
+    starting_date = models.DateField(default=now())
+    ending_date = models.DateField(default=now())
+
+    def __str__(self) -> str:
+        return f"{self.name}"
+
+# Sport event comes from the games of different schedules 
+class SportEvent(models.Model):
+    event_id = models.IntegerField()
+    season = models.ForeignKey(Season, on_delete=models.CASCADE)
+    league = models.ForeignKey(SportLeague, on_delete=models.RESTRICT)
+    home_team = models.CharField(max_length=255)
+    away_team = models.CharField(max_length=255)
     start_datetime = models.DateTimeField(default=now())
-    end_datetime = models.DateTimeField(blank=True, null=True)
-    status = models.CharField(max_length=1, choices=Sport_Status, default=Sport_Status['Not-Started'])
+    status = models.CharField(max_length=50, choices=Sport_Status, default=Sport_Status['Not-Started'])
+    home_score = models.IntegerField(default=0)
+    away_score = models.IntegerField(default=0)
 
     def __str__(self) -> str:
-        return f"{self.start_datetime.date()} {self.league.sport.title} {self.league.title}"
-
-class SportEventResult(models.Model):
-    sport_event = models.ForeignKey(SportEvent, on_delete=models.CASCADE)
-    home = models.ForeignKey(Team, on_delete=models.RESTRICT)
-    away = models.ForeignKey(Team, on_delete=models.RESTRICT, related_name='away')
-    home_score = models.FloatField(default=0)
-    away_score = models.FloatField(default=0)
-
-    def __str__(self) -> str:
-        title = f"{self.sport_event.league.sport.title} {self.sport_event.league.title}"
-        title += f' {self.home}: {self.home_score} {self.away}: {self.away_score}'
-        return title
+        return f"{self.home_team} vs {self.away_team} / {self.league.title} / {self.start_datetime}"
