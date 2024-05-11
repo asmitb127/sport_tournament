@@ -33,7 +33,7 @@ class Season(models.Model):
     ending_date = models.DateField(default=now())
 
     def __str__(self) -> str:
-        return f"{self.name} {self.year}"
+        return f"{self.name}"
 
 # Sport event comes from the games of different schedules 
 class SportEvent(models.Model):

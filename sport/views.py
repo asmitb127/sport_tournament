@@ -102,6 +102,7 @@ class SportView(views.APIView):
                         for round in rounds['rounds']:
                             for fixture in round['fixtures']:
                                 current_event = SportEvent.objects.filter(event_id=fixture['id'])
+                                
                                 if current_event.exists():
                                     if len(fixture['scores']) > 0:
                                         home_score, away_score = self.get_game_results(fixture['scores'])
@@ -126,16 +127,18 @@ class SportView(views.APIView):
                                         ) 
 
                                 else:
-                                    home_team, away_team = self.get_participants(fixture['participants'])
-                                    SportEvent.objects.create(
-                                        event_id = fixture['id'],
-                                        season = season,
-                                        league = season.league,
-                                        home_team = home_team,
-                                        away_team = away_team,
-                                        start_datetime = fixture['starting_at'],
-                                        status = Sport_Status['Not-Started']
-                                    ).save()
+                                    if fixture['starting_at_timestamp'] > now().timestamp():
+                                        
+                                        home_team, away_team = self.get_participants(fixture['participants'])
+                                        SportEvent.objects.create(
+                                            event_id = fixture['id'],
+                                            season = season,
+                                            league = season.league,
+                                            home_team = home_team,
+                                            away_team = away_team,
+                                            start_datetime = fixture['starting_at'],
+                                            status = Sport_Status['Not-Started']
+                                        ).save()
                                 
 
         except Exception as e:
@@ -146,13 +149,17 @@ class SportView(views.APIView):
         #get query 
         type = request.GET.get("type", None)
         print(f'type is {type}')
-        if type == 'leagues':
-            self.get_current_leagues()
-        elif type == 'seasons':
-            self.get_running_seasons()
-        elif type == 'schedule':
-            self.get_running_schedule()
 
+        try: 
+            if type == 'seasons':
+                self.get_current_leagues()
+                self.get_running_seasons()
+            else:
+                self.get_running_schedule()
+        except Exception as e:
+            print("exceptation on get", str(e))
+            return Response(str(e))
+        
         return Response({ "success": "true" })
 
 
