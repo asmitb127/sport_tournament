@@ -5,9 +5,9 @@ class SportEventSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SportEvent
-        fields = ['event_id', 'league', 'home_team', 'away_team', 
-                  'start_datetime', 'status', 'home_score', 'away_score']
+        fields = '_all__'
         read_only_fields = ['id']
+        depth = 2
 
     @staticmethod
     def get_league(obj):

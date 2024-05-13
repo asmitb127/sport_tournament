@@ -49,7 +49,7 @@ class PoolEntrySerializer(serializers.ModelSerializer):
         extra_kwargs = {'created_by': {'read_only': True}}
 
     def validate_join_time(self, value):
-        if value < datetime.now():
+        if value < datetime.now().date():
             raise serializers.ValidationError("Join time cannot be in the past")
         return value
 

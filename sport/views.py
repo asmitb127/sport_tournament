@@ -1,9 +1,11 @@
 import datetime, json
 from rest_framework import permissions, generics, views
 from rest_framework.response import Response
+from django.utils.timezone import now
+from django.db.models import Q
+
 from .seed_datas import get_leagues, get_seasons, get_schedule
 from .models import Sport, SportLeague, Season, SportEvent
-from django.utils.timezone import now
 from .serializers import SportEventSerializer, SportListSerializer, SeasonListSerializer
 from choices.choice  import Sport_Status
 
@@ -167,10 +169,25 @@ class SportEventList(generics.ListAPIView):
     queryset = SportEvent.objects.all()
     serializer_class = SportEventSerializer
 
-
     search_fields = ['league']
     order_fields = ['start_datetime', 'status']
     filterset_fields = ['league', 'event_id','status']
+
+    def get_queryset(self):
+        sport_event = SportEvent.objects.all()
+        start_date = None
+        end_date = None
+        # league_ids = []
+        season_ids = self.request.query_params.get('season_ids')
+        if season_ids:
+            season_ids = season_ids.split(',')
+        seasons = Season.objects.filter(pk__in=season_ids)
+        if seasons:
+            sport_event = sport_event.filter(season__in=seasons)
+        if start_date:
+            sport_event = sport_event.filter(start_datetime__gte=start_date).filter(start_datetime__gte=end_date)
+        self.queryset = sport_event
+        return super().get_queryset()
 
 class SportList(generics.ListAPIView):
     queryset = Sport.objects.all()
