@@ -26,17 +26,15 @@ class TournamentSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         tournament = Tournament.objects.create(
-            # tournament_id=validated_data['tournament_id'],
+            tournament_id=validated_data['tournament_id'],
             start_time=validated_data['start_time'],
             end_time=validated_data['end_time'],
             season_id=validated_data['season_id'],
             entry_fee=validated_data['entry_fee'],
             creator=self.context['request'].user,
             tournament_type=validated_data['tournament_type'],
-            sport_event=validated_data['sport_event']
         )
-
-        #save the data
+        [tournament.sport_event.add(each_event) for each_event in validated_data['sport_event']]
         tournament.save()
         return tournament
 
