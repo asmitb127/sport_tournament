@@ -26,7 +26,7 @@ class TournamentSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         tournament = Tournament.objects.create(
-            tournament_id=validated_data['tournament_id'],
+            # tournament_id=validated_data['tournament_id'],
             start_time=validated_data['start_time'],
             end_time=validated_data['end_time'],
             season_id=validated_data['season_id'],

@@ -23,7 +23,7 @@ class TournamentViewSet(viewsets.ModelViewSet):
         #create a queryset to get the tournament and events
         queryset = Tournament.objects.all()
         
-        return queryset
+    #     return queryset
 
 
 
