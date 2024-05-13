@@ -5,7 +5,7 @@ class SportEventSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SportEvent
-        fields = '_all__'
+        fields = '__all__'
         read_only_fields = ['id']
         depth = 2
 
