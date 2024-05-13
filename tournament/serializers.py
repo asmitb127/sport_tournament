@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from choices.choice import Tournament_Type
 from tournament.models import Tournament, PoolEntry, Picks
-from sport.models import Sport, SportEvent
+from sport.models import Sport, SportEvent, Season
 
 from datetime import datetime
 
@@ -12,10 +12,10 @@ class TournamentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tournament
         fields = '__all__'
-        extra_kwargs = {'created_by': {'read_only': True}}
+        extra_kwargs = {'creator': {'read_only': True}}
 
     def validate_start_time(self, value):
-        if value < datetime.now():
+        if value < datetime.now().date():
             raise serializers.ValidationError("Start time cannot be in the past")
         return value
 
@@ -24,7 +24,7 @@ class TournamentSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Entry fee cannot be negative")
         return value 
 
-    def create(self, validated_data):        
+    def create(self, validated_data):
         tournament = Tournament.objects.create(
             tournament_id=validated_data['tournament_id'],
             start_time=validated_data['start_time'],
