@@ -1,12 +1,12 @@
 from django.urls import path, include
 from rest_framework import routers
 
-from tournament import views
-
+from .views import add_pool_entry, TournamentViewSet, PoolEntryViewSet
 
 router = routers.DefaultRouter()
-router.register(r'view', views.TournamentViewSet, basename="tournament")
-router.register(r'entry', views.PoolEntryViewSet, basename="entry")
+router.register(r'create', TournamentViewSet, basename="tournament-create")
+router.register(r'list', PoolEntryViewSet, basename="list")
 urlpatterns = [
     path('', include(router.urls)),
+    path('add-pool-entry/', add_pool_entry, name='addentry')
 ]
