@@ -13,6 +13,7 @@ class TournamentSerializer(serializers.ModelSerializer):
         model = Tournament
         fields = '__all__'
         extra_kwargs = {'creator': {'read_only': True}}
+        depth = 1
 
     def validate_start_time(self, value):
         if value < datetime.now().date():

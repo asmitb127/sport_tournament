@@ -1,4 +1,4 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, views
 from datetime import datetime
 from rest_framework.decorators import api_view
 from rest_framework.response import Response as JSONResponse
@@ -29,20 +29,20 @@ def validate_picks(value):
 
 
 
-@api_view(['POST'])
-def add_pool_entry(request):
-    # add a pool entry for the tournament
+class AddPoolEntry(views.APIView):
+    authentication_classes = [TokenAuthentications]
+    permission_classes = [permissions.IsAuthenticated,]
 
-    if request.method == 'POST':
+    def post(self, request):
         tournament_id = request.data['tournament_id']
         if not Tournament.objects.filter(tournament_id=tournament_id).exists():
             return JSONResponse({'error': 'Tournament does not exist'}, status=400)
 
         pool_entry = PoolEntry.objects.create(
             tournament=Tournament.objects.get(tournament_id=tournament_id),
-            entry_txn=request.data['entry_txn'],
-            network=request.data['network'],
-            join_time=request.data['join_time']
+            entry_txn=request.data.get('entry_txn') or 1,
+            network=request.data.get('network') or 1,
+            player_id=request.user.id
         )
         pool_entry.save()
 
@@ -55,13 +55,12 @@ def add_pool_entry(request):
             ).save()
 
         return JSONResponse({'success': 'Pool entry added'}, status=200)
-    
 
 class PoolEntryViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = PoolEntry.objects.all()
     serializer_class = PoolEntrySerializer
 
-    def get_queryset(self):
-        queryset = PoolEntry.objects.all()
+    # def get_queryset(self):
+    #     queryset = PoolEntry.objects.all()
         
-        return queryset
+    #     return queryset
