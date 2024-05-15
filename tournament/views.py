@@ -35,11 +35,11 @@ class AddPoolEntry(views.APIView):
 
     def post(self, request):
         tournament_id = request.data['tournament_id']
-        if not Tournament.objects.filter(tournament_id=tournament_id).exists():
+        if not Tournament.objects.filter(id=tournament_id).exists():
             return JSONResponse({'error': 'Tournament does not exist'}, status=400)
 
         pool_entry = PoolEntry.objects.create(
-            tournament=Tournament.objects.get(tournament_id=tournament_id),
+            tournament=Tournament.objects.get(id=tournament_id),
             entry_txn=request.data.get('entry_txn') or 1,
             network=request.data.get('network') or 1,
             player_id=request.user.id
