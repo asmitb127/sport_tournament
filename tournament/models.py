@@ -15,7 +15,7 @@ class Tournament(models.Model):
     tournament_id = models.IntegerField()
     start_time = models.DateField()
     end_time = models.DateField()
-    season_id = models.ForeignKey(Season, on_delete=models.RESTRICT)
+    season = models.ForeignKey(Season, on_delete=models.RESTRICT)
     entry_fee = models.FloatField()
     creator = models.ForeignKey(CustomUser, on_delete=models.RESTRICT)
     tournament_type = models.CharField(max_length=10, choices=Tournament_Type)
