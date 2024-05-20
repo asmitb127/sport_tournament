@@ -30,8 +30,10 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = json.loads(env('DEBUG'))
-
+try:
+    DEBUG = json.loads(env('DEBUG'))
+except Exception as e:
+    DEBUG = env('DEBUG') == 'true'
 ALLOWED_HOSTS = ['championfan.co', 'api.championfan.co', '127.0.0.1', 'localhost', '41.185.64.44']
 
 
@@ -59,6 +61,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     "corsheaders.middleware.CorsMiddleware",
     'django.middleware.common.CommonMiddleware',
@@ -67,9 +70,11 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO',  env('SECURE_PROXY_SSL_HEADER'))
-SECURE_SSL_REDIRECT =  json.loads(env('SECURE_SSL_REDIRECT'))
+try:
+    SECURE_SSL_REDIRECT =  json.loads(env('SECURE_SSL_REDIRECT'))
+except Exception as e:
+    SECURE_SSL_REDIRECT = env('SECURE_SSL_REDIRECT') == 'true'
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
@@ -170,10 +175,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = '/static/'
+#STATICFILES_DIRS = os.path.join(BASE_DIR, "static"),
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'staticfiles/static'),
-]
+# STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
 
 # Default primary key field type
