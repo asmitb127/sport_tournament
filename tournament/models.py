@@ -12,13 +12,13 @@ from core.models import CustomUser
 # pool is tournament 
 class Tournament(models.Model):
 
-    tournament_id = models.IntegerField()
+    tournament_id = models.IntegerField(unique=True)
     start_time = models.DateField()
     end_time = models.DateField()
     season = models.ForeignKey(Season, on_delete=models.RESTRICT)
     entry_fee = models.FloatField()
     creator = models.ForeignKey(CustomUser, on_delete=models.RESTRICT)
-    tournament_type = models.CharField(max_length=10, choices=Tournament_Type)
+    tournament_type = models.CharField(max_length=10, choices=Tournament_Type, default=Tournament_Type['O'])
     sport_event = models.ManyToManyField(SportEvent)
 
     def __str__(self) -> str:

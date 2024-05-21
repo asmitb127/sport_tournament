@@ -8,6 +8,14 @@ from sport.models import Sport, SportEvent, Season
 from datetime import datetime
 
 
+class TournamentListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tournament
+        fields = '__all__'
+        extra_kwargs = {'creator': {'read_only': True}}
+        depth = 1
+
+
 class TournamentSerializer(serializers.ModelSerializer):
     season = serializers.PrimaryKeyRelatedField(
         queryset=Season.objects.all()
@@ -37,6 +45,8 @@ class TournamentSerializer(serializers.ModelSerializer):
         return value
     
     def validate(self, attrs):
+        if not attrs.get('sport_event'):
+            raise serializers.ValidationError({'sport_event': ['This field is required.']})
         return super().validate(attrs)
 
     def create(self, validated_data):

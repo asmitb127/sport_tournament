@@ -1,12 +1,12 @@
 from rest_framework import viewsets, views
 from datetime import datetime
 from rest_framework.decorators import api_view
-from rest_framework.response import Response as JSONResponse
+from rest_framework.response import Response
 from rest_framework import permissions
 
 from core.custom_permissions import TokenAuthentications
 from sport.models import Sport, SportEvent
-from tournament.serializers import TournamentSerializer, PoolEntrySerializer
+from tournament.serializers import TournamentSerializer, PoolEntrySerializer, TournamentListSerializer
 from tournament.models import Tournament, PoolEntry, Picks
 
 
@@ -14,6 +14,16 @@ class TournamentViewSet(viewsets.ModelViewSet):
     queryset = Tournament.objects.all()
     serializer_class = TournamentSerializer
     authentication_classes = [TokenAuthentications]
+
+    def get_serializer_class(self, *args, **kwargs):
+        if self.action=='retrieve':
+            return TournamentListSerializer
+        return TournamentSerializer
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
 
 
 def validate_join_time(value):

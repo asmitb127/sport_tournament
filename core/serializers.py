@@ -13,6 +13,9 @@ class RegisterSerializer(serializers.ModelSerializer):
         model = User
         fields = ('username', 'password', 'email', 'first_name', 'last_name', 'phone_number', 'nationality', 'full_name')
 
+    def validate_phone_number(self, phone_number):
+        return phone_number
+
     def create(self, validated_data):
         full_name = validated_data['full_name'].split(' ')
         if len(full_name) <2:
