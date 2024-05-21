@@ -46,7 +46,10 @@ class AddPoolEntry(views.APIView):
     def post(self, request):
         tournament_id = request.data['tournament_id']
         if not Tournament.objects.filter(id=tournament_id).exists():
-            return JSONResponse({'error': 'Tournament does not exist'}, status=400)
+            return Response({'error': 'Tournament does not exist'}, status=400)
+
+        if PoolEntry.objects.filter(tournament__id=tournament_id).exists():
+            return Response({'error': 'You have already picked for this tournament.'}, status=400)
 
         pool_entry = PoolEntry.objects.create(
             tournament=Tournament.objects.get(id=tournament_id),
@@ -64,7 +67,7 @@ class AddPoolEntry(views.APIView):
                 pick=pick['pick']
             ).save()
 
-        return JSONResponse({'success': 'Pool entry added'}, status=200)
+        return Response({'success': 'Pool entry added'}, status=200)
 
 class PoolEntryViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = PoolEntry.objects.all()
