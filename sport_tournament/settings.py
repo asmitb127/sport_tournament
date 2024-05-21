@@ -34,7 +34,7 @@ try:
     DEBUG = json.loads(env('DEBUG'))
 except Exception as e:
     DEBUG = env('DEBUG') == 'true'
-ALLOWED_HOSTS = ['championfan.co', 'api.championfan.co', '127.0.0.1', 'localhost', '41.185.64.44']
+ALLOWED_HOSTS = ['https://championfan.co/', 'championfan.co', 'api.championfan.co', '127.0.0.1', 'localhost', '41.185.64.44', 'sport.championfan.co', 'https://sport.championfan.co']
 
 
 # Application definition
@@ -78,6 +78,8 @@ except Exception as e:
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
+    "https://sport.championfan.co",
+    "https://championfan.co",
 ]
 CORS_ALLOW_METHODS = (
     "DELETE",
