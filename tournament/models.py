@@ -12,7 +12,8 @@ from core.models import CustomUser
 # pool is tournament 
 class Tournament(models.Model):
 
-    tournament_id = models.IntegerField(unique=True)
+    name = models.CharField(max_length=255)
+    tournament_id = models.CharField(max_length=255, unique=True)
     start_time = models.DateField()
     end_time = models.DateField()
     season = models.ForeignKey(Season, on_delete=models.RESTRICT)
