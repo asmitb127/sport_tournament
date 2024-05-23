@@ -16,13 +16,27 @@ class TournamentViewSet(viewsets.ModelViewSet):
     authentication_classes = [TokenAuthentications]
 
     def get_serializer_class(self, *args, **kwargs):
-        if self.action=='retrieve':
+        if self.action in ['retrieve', 'list']:
             return TournamentListSerializer
         return TournamentSerializer
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
+        instance.__dict__.update({'player_count': instance.pool_entry.count()})
         serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        for each in queryset:
+            each.__dict__.update({'player_count': each.pool_entry.count()})
+        serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
 

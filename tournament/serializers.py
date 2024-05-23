@@ -9,6 +9,7 @@ from datetime import datetime
 
 
 class TournamentListSerializer(serializers.ModelSerializer):
+    player_count = serializers.IntegerField()
     class Meta:
         model = Tournament
         fields = '__all__'

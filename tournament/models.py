@@ -28,7 +28,7 @@ class Tournament(models.Model):
     
 # it saves the pool entry for the tournament for different users 
 class PoolEntry(models.Model):
-    tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE)
+    tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE,related_name='pool_entry')
     entry_txn = models.TextField(max_length=100)
     player = models.ForeignKey(CustomUser, on_delete=models.RESTRICT)
     network = models.CharField(max_length=10, choices=NETWORK,default=NETWORK['ETH'] )
