@@ -53,6 +53,7 @@ class TournamentSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         tournament = Tournament.objects.create(
             tournament_id=validated_data['tournament_id'],
+            name=validated_data['name'],
             start_time=validated_data['start_time'],
             end_time=validated_data['end_time'],
             season=validated_data['season'],

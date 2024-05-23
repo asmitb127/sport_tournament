@@ -12,7 +12,7 @@ from core.models import CustomUser
 # pool is tournament 
 class Tournament(models.Model):
 
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, required=True)
     tournament_id = models.CharField(max_length=255, unique=True)
     start_time = models.DateField()
     end_time = models.DateField()
