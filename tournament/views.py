@@ -1,4 +1,4 @@
-from rest_framework import viewsets, views
+from rest_framework import viewsets, views, status, generics
 from datetime import datetime
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -6,14 +6,17 @@ from rest_framework import permissions
 
 from core.custom_permissions import TokenAuthentications
 from sport.models import Sport, SportEvent
-from tournament.serializers import TournamentSerializer, PoolEntrySerializer, TournamentListSerializer
 from tournament.models import Tournament, PoolEntry, Picks
+
+from tournament.serializers.tournament import TournamentSerializer, TournamentListSerializer
+from tournament.serializers.pool_entry import PoolEntrySerializer,PoolEntryEventSerializer
 
 
 class TournamentViewSet(viewsets.ModelViewSet):
     queryset = Tournament.objects.all()
     serializer_class = TournamentSerializer
     authentication_classes = [TokenAuthentications]
+    permission_classes = [permissions.IsAuthenticated,]
 
     def get_serializer_class(self, *args, **kwargs):
         if self.action in ['retrieve', 'list']:
@@ -24,7 +27,7 @@ class TournamentViewSet(viewsets.ModelViewSet):
         instance = self.get_object()
         instance.__dict__.update({'player_count': instance.pool_entry.count()})
         serializer = self.get_serializer(instance)
-        return Response(serializer.data)
+        return Response(serializer.data, status.HTTP_200_OK)
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
@@ -37,20 +40,7 @@ class TournamentViewSet(viewsets.ModelViewSet):
         for each in queryset:
             each.__dict__.update({'player_count': each.pool_entry.count()})
         serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
-
-
-def validate_join_time(value):
-    if value < datetime.now():
-        return False
-    return value
-
-def validate_picks(value):
-    for pick in value:
-        if not SportEvent.objects.filter(event_id=pick['event_id']).exists():
-            return False
-    return value
-
+        return Response(serializer.data, status.HTTP_200_OK)
 
 
 class AddPoolEntry(views.APIView):
@@ -81,7 +71,7 @@ class AddPoolEntry(views.APIView):
                 pick=pick['pick']
             ).save()
 
-        return Response({'success': 'Pool entry added'}, status=200)
+        return Response({'success': 'Pool entry added'}, status=status.HTTP_200_OK)
 
 class PoolEntryViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = PoolEntry.objects.all()
@@ -89,5 +79,18 @@ class PoolEntryViewSet(viewsets.ReadOnlyModelViewSet):
 
     # def get_queryset(self):
     #     queryset = PoolEntry.objects.all()
-        
     #     return queryset
+
+class MyTournamentViewSet(generics.ListAPIView):
+    authentication_classes = [TokenAuthentications]
+    permission_classes = [permissions.IsAuthenticated,]
+    queryset = Tournament.objects.all()
+    serializer_class = PoolEntryEventSerializer
+
+    def get_queryset(self):
+        return Tournament.objects.all()
+
+    def get(self, request):
+        queryset = self.get_queryset().filter(my_pool_entry__player=request.user)
+        data = self.get_serializer(queryset, many=True, context=request).data
+        return Response({'sucess': 'User Pool entry fetched.', 'data': data}, status=status.HTTP_200_OK)

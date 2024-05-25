@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import SportEvent, Sport, Season, SportLeague
+from sport.models import SportEvent, Sport, Season, SportLeague
 
 class SportEventSerializer(serializers.ModelSerializer):
 

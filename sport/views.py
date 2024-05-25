@@ -3,10 +3,10 @@ from rest_framework import permissions, generics, views
 from rest_framework.response import Response
 from django.utils.timezone import now
 from django.db.models import Q
-
+1
 from .seed_datas import get_leagues, get_seasons, get_schedule
 from .models import Sport, SportLeague, Season, SportEvent
-from .serializers import SportEventSerializer, SportListSerializer, SeasonListSerializer
+from .serializers.sport import SportEventSerializer, SportListSerializer, SeasonListSerializer
 from choices.choice  import Sport_Status
 
 # Create your views here.

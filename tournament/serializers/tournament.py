@@ -44,7 +44,7 @@ class TournamentSerializer(serializers.ModelSerializer):
         if value <= 0:
             raise serializers.ValidationError("Entry fee cannot be negative")
         return value
-    
+
     def validate(self, attrs):
         if not attrs.get('sport_event'):
             raise serializers.ValidationError({'sport_event': ['This field is required.']})
@@ -65,12 +65,5 @@ class TournamentSerializer(serializers.ModelSerializer):
         tournament.save()
         return tournament
 
-
-class PoolEntrySerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = PoolEntry
-        fields = '__all__'
-        extra_kwargs = {'created_by': {'read_only': True}}
 
 
