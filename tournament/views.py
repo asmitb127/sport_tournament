@@ -1,5 +1,4 @@
 from rest_framework import viewsets, views, status, generics
-from datetime import datetime
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import permissions
@@ -10,6 +9,7 @@ from tournament.models import Tournament, PoolEntry, Picks
 
 from tournament.serializers.tournament import TournamentSerializer, TournamentListSerializer
 from tournament.serializers.pool_entry import PoolEntrySerializer,PoolEntryEventSerializer
+from tournament.serializers.leaderboard import LeaderboardSerializer
 
 
 class TournamentViewSet(viewsets.ModelViewSet):
@@ -25,7 +25,7 @@ class TournamentViewSet(viewsets.ModelViewSet):
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
-        instance.__dict__.update({'player_count': instance.pool_entry.count()})
+        instance.__dict__.update({'player_count': instance.my_pool_entry.count()})
         serializer = self.get_serializer(instance)
         return Response(serializer.data, status.HTTP_200_OK)
 
@@ -38,7 +38,7 @@ class TournamentViewSet(viewsets.ModelViewSet):
             return self.get_paginated_response(serializer.data)
 
         for each in queryset:
-            each.__dict__.update({'player_count': each.pool_entry.count()})
+            each.__dict__.update({'player_count': each.my_pool_entry.count()})
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data, status.HTTP_200_OK)
 
@@ -73,6 +73,7 @@ class AddPoolEntry(views.APIView):
 
         return Response({'success': 'Pool entry added'}, status=status.HTTP_200_OK)
 
+
 class PoolEntryViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = PoolEntry.objects.all()
     serializer_class = PoolEntrySerializer
@@ -81,16 +82,32 @@ class PoolEntryViewSet(viewsets.ReadOnlyModelViewSet):
     #     queryset = PoolEntry.objects.all()
     #     return queryset
 
-class MyTournamentViewSet(generics.ListAPIView):
+
+class MyPoolPickUpViewSet(generics.ListAPIView):
     authentication_classes = [TokenAuthentications]
     permission_classes = [permissions.IsAuthenticated,]
     queryset = Tournament.objects.all()
     serializer_class = PoolEntryEventSerializer
 
-    def get_queryset(self):
-        return Tournament.objects.all()
-
     def get(self, request):
         queryset = self.get_queryset().filter(my_pool_entry__player=request.user)
         data = self.get_serializer(queryset, many=True, context=request).data
         return Response({'sucess': 'User Pool entry fetched.', 'data': data}, status=status.HTTP_200_OK)
+
+
+class MyPoolLeaderViewSet(generics.ListAPIView):
+    authentication_classes = [TokenAuthentications]
+    permission_classes = [permissions.IsAuthenticated,]
+    queryset = Tournament.objects.all()
+    serializer_class = LeaderboardSerializer
+
+    def get(self, request):
+        '''
+        Current Tournament Leaderboard
+        '''
+        try:
+            queryset = self.get_queryset().filter(my_pool_entry__player=request.user)
+            tournament_leaderboard = self.get_serializer(queryset, many=True, context=request).data
+            return Response({'sucess': 'Leaderboard fetched.', 'data': tournament_leaderboard}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)

@@ -48,4 +48,4 @@ class SportEvent(models.Model):
     away_score = models.IntegerField(default=0)
 
     def __str__(self) -> str:
-        return f"{self.home_team} vs {self.away_team} / {self.league.title} / {self.start_datetime}"
+        return f"{self.home_team} vs {self.away_team} / {self.league.title} / {self.start_datetime.date()}"

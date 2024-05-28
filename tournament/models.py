@@ -25,7 +25,7 @@ class Tournament(models.Model):
     sport_event = models.ManyToManyField(SportEvent, related_name='tournament')
 
     def __str__(self) -> str:
-        title = f"{self.sport_event} {self.created_by}"
+        title = f"{self.name} {self.creator}"
         return title
 
 class PoolEntry(models.Model):
@@ -43,3 +43,4 @@ class Picks(models.Model):
     pool_entry = models.ForeignKey(PoolEntry, on_delete=models.CASCADE, related_name='my_picks')
     event_id = models.ForeignKey(SportEvent, on_delete=models.CASCADE, related_name='my_event')
     pick = models.CharField(max_length=5, choices=PICK_CHOICE)
+
