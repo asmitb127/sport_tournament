@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.db.models import Q
 
 from tournament.models import PoolEntry, Tournament
 from sport.models import SportEvent
@@ -29,5 +30,9 @@ class PoolEntryEventSerializer(serializers.ModelSerializer):
     def get_sport_event(self, obj):
         data = None
         if obj.sport_event:
-            data = PlayerSportEventSerializer(SportEvent.objects.filter(my_event__pool_entry__player=self.context.user), many=True, context=self.context).data
+            q_objects = Q(my_event__pool_entry__player=self.context.user)
+            tournament_id = self.context.query_params.get('tournament_id')
+            if tournament_id:
+                q_objects &= Q(my_event__pool_entry__tournament__id=int(tournament_id))
+            data = PlayerSportEventSerializer(SportEvent.objects.filter(q_objects), many=True, context=self.context).data
         return data

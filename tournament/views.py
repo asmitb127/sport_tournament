@@ -1,7 +1,8 @@
 from rest_framework import viewsets, views, status, generics
-from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import permissions
+
+from django.db.models import Q
 
 from core.custom_permissions import TokenAuthentications
 from sport.models import Sport, SportEvent
@@ -51,9 +52,12 @@ class AddPoolEntry(views.APIView):
         tournament_id = request.data['tournament_id']
         if not Tournament.objects.filter(id=tournament_id).exists():
             return Response({'error': 'Tournament does not exist'}, status=400)
+        if not request.data.get('picks'):
+            return Response('Please select at least one pick.', status=status.HTTP_400_BAD_REQUEST)
 
-        if PoolEntry.objects.filter(tournament__id=tournament_id).exists():
-            return Response({'error': 'You have already picked for this tournament.'}, status=400)
+        picks_id =  PoolEntry.objects.filter(tournament__id=tournament_id, my_picks__isnull=False).values_list('my_picks', flat=True)
+        if picks_id:
+            [ Picks.objects.filter(pk=each).delete() for each in picks_id]
 
         pool_entry = PoolEntry.objects.create(
             tournament=Tournament.objects.get(id=tournament_id),
@@ -90,8 +94,13 @@ class MyPoolPickUpViewSet(generics.ListAPIView):
     serializer_class = PoolEntryEventSerializer
 
     def get(self, request):
-        queryset = self.get_queryset().filter(my_pool_entry__player=request.user)
-        data = self.get_serializer(queryset, many=True, context=request).data
+        q_objects = Q(my_pool_entry__player=request.user)
+        tournament_id =  self.request.query_params.get('tournament_id')
+        data=None
+        if tournament_id:
+            q_objects &= Q(pk=int(tournament_id))
+            queryset = self.get_queryset().filter(q_objects).first()
+            data = self.get_serializer(queryset, context=request).data
         return Response({'sucess': 'User Pool entry fetched.', 'data': data}, status=status.HTTP_200_OK)
 
 
@@ -106,7 +115,8 @@ class MyPoolLeaderViewSet(generics.ListAPIView):
         Current Tournament Leaderboard
         '''
         try:
-            queryset = self.get_queryset().filter(my_pool_entry__player=request.user)
+            q_objects = Q(my_pool_entry__player=request.user)
+            queryset = self.get_queryset().filter(q_objects)
             tournament_leaderboard = self.get_serializer(queryset, many=True, context=request).data
             return Response({'sucess': 'Leaderboard fetched.', 'data': tournament_leaderboard}, status=status.HTTP_200_OK)
         except Exception as e:

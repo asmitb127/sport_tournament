@@ -30,6 +30,7 @@ class LeaderboardSerializer(serializers.ModelSerializer):
     def get_points(self, obj):
         pool_entry_with_winner = PoolEntry.objects.filter(
                                     player=self.context.user,
+                                    my_picks__event_id__status='active',
                                     tournament__end_time__gte=datetime.now().date()
                                 ).annotate(
                                     winner=Case(

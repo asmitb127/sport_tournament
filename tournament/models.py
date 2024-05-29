@@ -23,6 +23,7 @@ class Tournament(models.Model):
     creator = models.ForeignKey(CustomUser, on_delete=models.RESTRICT)
     tournament_type = models.CharField(max_length=10, choices=Tournament_Type, default=Tournament_Type['O'])
     sport_event = models.ManyToManyField(SportEvent, related_name='tournament')
+    sport = models.ForeignKey(Sport, blank=True, null=True, on_delete=models.RESTRICT)
 
     def __str__(self) -> str:
         title = f"{self.name} {self.creator}"

@@ -14,7 +14,7 @@ class TournamentListSerializer(serializers.ModelSerializer):
         model = Tournament
         fields = '__all__'
         extra_kwargs = {'creator': {'read_only': True}}
-        depth = 1
+        depth = 2
 
 
 class TournamentSerializer(serializers.ModelSerializer):
@@ -52,14 +52,15 @@ class TournamentSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         tournament = Tournament.objects.create(
-            tournament_id=validated_data['tournament_id'],
-            name=validated_data['name'],
-            start_time=validated_data['start_time'],
-            end_time=validated_data['end_time'],
-            season=validated_data['season'],
-            entry_fee=validated_data['entry_fee'],
-            creator=self.context['request'].user,
-            tournament_type=validated_data['tournament_type'],
+            tournament_id= validated_data['tournament_id'],
+            name= validated_data['name'],
+            start_time= validated_data['start_time'],
+            end_time= validated_data['end_time'],
+            season= validated_data['season'],
+            entry_fee= validated_data['entry_fee'],
+            creator= self.context['request'].user,
+            tournament_type= validated_data['tournament_type'],
+            sport = validated_data['season'].league.sport
         )
         [tournament.sport_event.add(each_event) for each_event in validated_data['sport_event']]
         tournament.save()
