@@ -55,17 +55,21 @@ class AddPoolEntry(views.APIView):
         if not request.data.get('picks'):
             return Response('Please select at least one pick.', status=status.HTTP_400_BAD_REQUEST)
 
-        picks_id =  PoolEntry.objects.filter(tournament__id=tournament_id, my_picks__isnull=False).values_list('my_picks', flat=True)
+        pool_entry =  PoolEntry.objects.filter(player=request.user, tournament__id=tournament_id, my_picks__isnull=False).first()
+        try:
+            picks_id = pool_entry.my_picks.values_list('id', flat=True)
+        except Exception as e:
+            picks_id = None
         if picks_id:
             [ Picks.objects.filter(pk=each).delete() for each in picks_id]
-
-        pool_entry = PoolEntry.objects.create(
-            tournament=Tournament.objects.get(id=tournament_id),
-            entry_txn=request.data.get('entry_txn') or 1,
-            network=request.data.get('network') or 1,
-            player_id=request.user.id
-        )
-        pool_entry.save()
+        if not pool_entry:
+            pool_entry = PoolEntry.objects.create(
+                tournament=Tournament.objects.get(id=tournament_id),
+                entry_txn=request.data.get('entry_txn') or 1,
+                network=request.data.get('network') or 1,
+                player_id=request.user.id
+            )
+            pool_entry.save()
 
         for pick in request.data['picks']:
             sport_event = SportEvent.objects.get(event_id=pick['event_id'])
