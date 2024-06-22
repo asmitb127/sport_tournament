@@ -69,34 +69,37 @@ class SportView(views.APIView):
         try: 
             leagues = SportLeague.objects.all()
             for league in leagues:
+                print("league", league)
                 #events 
-                events = get_schedule(league['league_id'])
-                for event in events:
-                    current_event = SportEvent.objects.get(event_id=event['idEvent'])
-                    event_time = datetime.datetime.strptime(event['strTimestamp'], '%Y-%m-%dT%H:%M:%S')
-                    current_time = datetime.datetime.now()
-                    #check if it is a past event
-
-                    if current_event and current_time > event_time:
-                        #update the codebase for the event scores and check for the 
-                        # reschedule of the events if any
-                        #update the status of the current event 
-                        current_event.home_score = event['intHomeScore']
-                        current_event.away_score = event['intAwayScore']
-                        current_event.status = event['strStatus']
-                        if event['strPostponed'] == 'true':
-                            current_event.start_datetime = event_time
-                    else:
-                        #create new event
-                        current_event = SportEvent.objects.create(
-                            event_id = event['idEvent'],
-                            league = league,
-                            home_team = event['strHomeTeam'],
-                            away_team = event['strAwayTeam'],
-                            start_datetime = event['strTimestamp'],
-                            status = event['strStatus']
-                        )
-                    current_event.save()
+                events = get_schedule(league.league_id)
+                print(f'events = {events} is for {league}')
+                if events != None:
+                    for event in events:
+                        current_event = SportEvent.objects.filter(event_id=event['idEvent'])
+                        event_time = datetime.datetime.strptime(event['strTimestamp'], '%Y-%m-%dT%H:%M:%S')
+                        current_time = datetime.datetime.now()
+                        #check if it is a past event
+                        print(f'event = {event}')
+                        if current_event and current_time > event_time:
+                            #update the codebase for the event scores and check for the 
+                            # reschedule of the events if any
+                            #update the status of the current event 
+                            current_event.home_score = event['intHomeScore']
+                            current_event.away_score = event['intAwayScore']
+                            current_event.status = event['strStatus']
+                            if event['strPostponed'] == 'true':
+                                current_event.start_datetime = event_time
+                        else:
+                            #create new event
+                            current_event = SportEvent.objects.create(
+                                event_id = event['idEvent'],
+                                league = league,
+                                home_team = event['strHomeTeam'],
+                                away_team = event['strAwayTeam'],
+                                start_datetime = event['strTimestamp'],
+                                status = event['strStatus']
+                            )
+                        current_event.save()
         except Exception as e:
             print("exceptation on fetching leagues", str(e))
             return Response(str(e))

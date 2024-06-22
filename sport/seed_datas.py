@@ -30,7 +30,7 @@ def get_full_path(path, query=''):
     '''
     url = env('baseUrl')
     api_key = env('api_key')
-    return f"{url}{path}{query}?api_token={api_key}"
+    return f"https://{url}{path}{query}"
 
 
 def get_leagues():
@@ -51,7 +51,7 @@ def get_seasons():
 
 def get_schedule(league_id):
     url_path = get_full_path(path['schedule'], "")
-    url_path = url_path.replace('LEAGUE_ID', league_id)
+    url_path = url_path.replace('LEAGUE_ID', str(league_id))
     response = requests.get(url_path)
     logging.info('response %s', response)
     data = response.json()
