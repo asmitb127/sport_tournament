@@ -19,9 +19,9 @@ seeder = Seed.seeder()
 
 # add path of api
 path={
-    'league': '/v3/football/leagues',
-    'competition_season': '/v3/football/seasons/search/2024',
-    'schedule': '/v3/football/schedules/seasons/'
+    'league': '/v1/json/3/all_leagues.php',
+    'competition_season': '/v1/json/3/search_all_seasons.php?id=LEAGUE_ID',
+    'schedule': '/v1/json/3/eventsseason.php?id=LEAGUE_ID&s=2024-2025'
 }
 
 def get_full_path(path, query=''):
@@ -39,7 +39,7 @@ def get_leagues():
     logging.info('response %s', response)
     data = response.json()
 
-    return data.get("data")
+    return data.get("leagues")
 
 
 def get_seasons():
@@ -47,14 +47,15 @@ def get_seasons():
     response = requests.get(url_path)
     logging.info('response %s', response)
     data = response.json()
-    return data.get("data")
+    return data.get("seasons")
 
-def get_schedule(season_id):
-    url_path = get_full_path(path['schedule'], season_id)
+def get_schedule(league_id):
+    url_path = get_full_path(path['schedule'], "")
+    url_path = url_path.replace('LEAGUE_ID', league_id)
     response = requests.get(url_path)
     logging.info('response %s', response)
     data = response.json()
-    return data.get("data")
+    return data.get("events")
 
         
 

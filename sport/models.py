@@ -38,7 +38,7 @@ class Season(models.Model):
 # Sport event comes from the games of different schedules 
 class SportEvent(models.Model):
     event_id = models.IntegerField()
-    season = models.ForeignKey(Season, on_delete=models.CASCADE)
+    # season = models.ForeignKey(Season, on_delete=models.CASCADE)
     league = models.ForeignKey(SportLeague, on_delete=models.RESTRICT)
     home_team = models.CharField(max_length=255)
     away_team = models.CharField(max_length=255)
