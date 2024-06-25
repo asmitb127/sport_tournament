@@ -136,13 +136,16 @@ class SportEventList(generics.ListAPIView):
         start_date = datetime.datetime.strptime(self.request.query_params.get('start_datetime'), '%Y-%m-%dT%H:%M:%S')
         end_date = datetime.datetime.strptime(self.request.query_params.get('end_datetime'), '%Y-%m-%dT%H:%M:%S')
         league_id = self.request.query_params.get('league_id')
-        league = Season.objects.filter(pk=league_id)
+        league =  SportLeague.objects.filter(pk=league_id)
         if league.exists():
-            sport_event = sport_event.filter(league=league)
-        if start_date:
-            sport_event = sport_event.filter(start_datetime__gte=start_date).filter(start_datetime__lte=end_date)
-        self.queryset = sport_event
-        return super().get_queryset()
+            print("league", league)
+            #filter the sport events with league 
+            sport_event = sport_event.filter(league=league[0])
+            print("sport event", sport_event)
+            if start_date:
+                sport_event = sport_event.filter(start_datetime__gte=start_date).filter(start_datetime__lte=end_date)
+            self.queryset = sport_event
+            return super().get_queryset()
 
 class SportList(generics.ListAPIView):
     queryset = Sport.objects.all()
