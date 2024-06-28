@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from choices.choice import Tournament_Type
 from tournament.models import Tournament, PoolEntry, Picks
-from sport.models import Sport, SportEvent, Season
+from sport.models import Sport, SportEvent, Season, SportLeague
 
 
 from datetime import datetime
@@ -18,12 +18,16 @@ class TournamentListSerializer(serializers.ModelSerializer):
 
 
 class TournamentSerializer(serializers.ModelSerializer):
-    season = serializers.PrimaryKeyRelatedField(
-        queryset=Season.objects.all()
-    )
+    # season = serializers.PrimaryKeyRelatedField(
+    #     queryset=Season.objects.all()
+    # )
     sport_event = serializers.PrimaryKeyRelatedField(
         many=True,
         queryset=SportEvent.objects.all()
+    )
+
+    league = serializers.PrimaryKeyRelatedField(
+        queryset=SportLeague.objects.all()
     )
 
     class Meta:
@@ -31,9 +35,6 @@ class TournamentSerializer(serializers.ModelSerializer):
         fields = '__all__'
         extra_kwargs = {'creator': {'read_only': True}}
         depth = 1
-
-    def validate_season(self, value):
-        return value
 
     def validate_start_time(self, value):
         if value < datetime.now().date():
@@ -56,11 +57,11 @@ class TournamentSerializer(serializers.ModelSerializer):
             name= validated_data['name'],
             start_time= validated_data['start_time'],
             end_time= validated_data['end_time'],
-            season= validated_data['season'],
+            league= validated_data['league'],
             entry_fee= validated_data['entry_fee'],
             creator= self.context['request'].user,
             tournament_type= validated_data['tournament_type'],
-            sport = validated_data['season'].league.sport
+            sport = validated_data['league'].sport
         )
         [tournament.sport_event.add(each_event) for each_event in validated_data['sport_event']]
         tournament.save()

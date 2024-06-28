@@ -2,10 +2,7 @@ from django.db import models
 from django.utils.timezone import now
 
 from choices.choice import NETWORK, Tournament_Type, PICK_CHOICE
-from sport.models import SportEvent, Sport
-from core.models import CustomUser
-
-from sport.models import Season, SportEvent
+from sport.models import Season, SportEvent, SportLeague, Sport
 from core.models import CustomUser
 
 
@@ -18,7 +15,8 @@ class Tournament(models.Model):
     tournament_id = models.CharField(max_length=255, unique=True)
     start_time = models.DateField()
     end_time = models.DateField()
-    season = models.ForeignKey(Season, on_delete=models.RESTRICT)
+    league = models.ForeignKey(SportLeague, on_delete=models.RESTRICT)
+    # season = models.ForeignKey(Season, on_delete=models.RESTRICT)
     entry_fee = models.FloatField()
     creator = models.ForeignKey(CustomUser, on_delete=models.RESTRICT)
     tournament_type = models.CharField(max_length=10, choices=Tournament_Type, default=Tournament_Type['O'])
