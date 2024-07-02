@@ -55,7 +55,7 @@ class AddPoolEntry(views.APIView):
         if not request.data.get('picks'):
             return Response('Please select at least one pick.', status=status.HTTP_400_BAD_REQUEST)
 
-        pool_entry =  PoolEntry.objects.filter(player=request.user, tournament__id=tournament_id, my_picks__isnull=False).first()
+        pool_entry =  PoolEntry.objects.filter(player=request.user, tournament__id=tournament_id).first()
         try:
             picks_id = pool_entry.my_picks.values_list('id', flat=True)
         except Exception as e:
@@ -85,6 +85,7 @@ class AddPoolEntry(views.APIView):
 class PoolEntryViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = PoolEntry.objects.all()
     serializer_class = PoolEntrySerializer
+
 
     # def get_queryset(self):
     #     queryset = PoolEntry.objects.all()

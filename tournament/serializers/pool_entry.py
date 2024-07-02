@@ -12,6 +12,8 @@ class PoolEntrySerializer(serializers.ModelSerializer):
         model = PoolEntry
         fields = '__all__'
         extra_kwargs = {'created_by': {'read_only': True}}
+        depth = 1
+        
 
 class PoolEntryEventSerializer(serializers.ModelSerializer):
     sport_event = serializers.PrimaryKeyRelatedField(
